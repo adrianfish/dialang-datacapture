@@ -1,0 +1,338 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.4
+-- Dumped by pg_dump version 10.4
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: baskets; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.baskets (
+    pass_id character(36) NOT NULL,
+    basket_id integer NOT NULL,
+    basket_number integer NOT NULL
+);
+
+
+ALTER TABLE public.baskets OWNER TO dialangadmin;
+
+--
+-- Name: item_responses; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.item_responses (
+    pass_id character(36) NOT NULL,
+    basket_id integer NOT NULL,
+    item_id integer NOT NULL,
+    answer_id integer,
+    answer_text character varying(255),
+    score integer NOT NULL,
+    correct boolean NOT NULL,
+    pass_order integer NOT NULL
+);
+
+
+ALTER TABLE public.item_responses OWNER TO dialangadmin;
+
+--
+-- Name: pass_booklet; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.pass_booklet (
+    pass_id character(36) NOT NULL,
+    booklet_id integer NOT NULL,
+    length integer NOT NULL
+);
+
+
+ALTER TABLE public.pass_booklet OWNER TO dialangadmin;
+
+--
+-- Name: passes; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.passes (
+    id character(36) NOT NULL,
+    session_id character(36) NOT NULL,
+    al character varying(16) NOT NULL,
+    tl character varying(16) NOT NULL,
+    skill character varying(32) NOT NULL,
+    started bigint NOT NULL
+);
+
+
+ALTER TABLE public.passes OWNER TO dialangadmin;
+
+--
+-- Name: questionnaire; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.questionnaire (
+    session_id character(36) NOT NULL,
+    age_group character(2) NOT NULL,
+    gender character varying(64) NOT NULL,
+    other_gender character varying(255) NOT NULL,
+    first_language character(6) NOT NULL,
+    nationality character(3) NOT NULL,
+    institution character varying(255) NOT NULL,
+    reason character(2) NOT NULL,
+    accuracy character(2) NOT NULL,
+    comments character varying(1024) NOT NULL,
+    email character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.questionnaire OWNER TO dialangadmin;
+
+--
+-- Name: sa_responses; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.sa_responses (
+    pass_id character(36) NOT NULL,
+    statement_id character varying(4) NOT NULL,
+    response boolean NOT NULL
+);
+
+
+ALTER TABLE public.sa_responses OWNER TO dialangadmin;
+
+--
+-- Name: sa_scores; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.sa_scores (
+    pass_id character(36) NOT NULL,
+    ppe double precision NOT NULL,
+    level character(2) NOT NULL
+);
+
+
+ALTER TABLE public.sa_scores OWNER TO dialangadmin;
+
+--
+-- Name: sessions; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.sessions (
+    id character(36) NOT NULL,
+    user_id character varying(255),
+    consumer_key character(36),
+    ip_address character varying(39) NOT NULL,
+    started bigint NOT NULL,
+    resource_link_id character varying(64),
+    resource_link_title character varying(255),
+    browser_locale character varying(24),
+    referrer character varying(255)
+);
+
+
+ALTER TABLE public.sessions OWNER TO dialangadmin;
+
+--
+-- Name: test_durations; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.test_durations (
+    pass_id character(36) NOT NULL,
+    start bigint NOT NULL,
+    finish bigint
+);
+
+
+ALTER TABLE public.test_durations OWNER TO dialangadmin;
+
+--
+-- Name: test_results; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.test_results (
+    pass_id character(36) NOT NULL,
+    grade integer NOT NULL,
+    level character(2) NOT NULL,
+    raw_score integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.test_results OWNER TO dialangadmin;
+
+--
+-- Name: tokens; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.tokens (
+    pass_id character(36) NOT NULL,
+    token character(36) NOT NULL,
+    current_basket integer,
+    vspt_skipped boolean NOT NULL,
+    sa_skipped boolean NOT NULL
+);
+
+
+ALTER TABLE public.tokens OWNER TO dialangadmin;
+
+--
+-- Name: vsp_test_responses; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.vsp_test_responses (
+    pass_id character(36) NOT NULL,
+    word_id character(36) NOT NULL,
+    response boolean NOT NULL
+);
+
+
+ALTER TABLE public.vsp_test_responses OWNER TO dialangadmin;
+
+--
+-- Name: vsp_test_scores; Type: TABLE; Schema: public; Owner: dialangadmin
+--
+
+CREATE TABLE public.vsp_test_scores (
+    pass_id character(36) NOT NULL,
+    z_score double precision NOT NULL,
+    meara_score integer NOT NULL,
+    level character(2) NOT NULL
+);
+
+
+ALTER TABLE public.vsp_test_scores OWNER TO dialangadmin;
+
+--
+-- Name: pass_booklet pass_booklet_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.pass_booklet
+    ADD CONSTRAINT pass_booklet_pkey PRIMARY KEY (pass_id);
+
+
+--
+-- Name: passes passes_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.passes
+    ADD CONSTRAINT passes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: baskets pk_pass_basket; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.baskets
+    ADD CONSTRAINT pk_pass_basket PRIMARY KEY (pass_id, basket_id);
+
+
+--
+-- Name: item_responses pk_pass_item; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.item_responses
+    ADD CONSTRAINT pk_pass_item PRIMARY KEY (pass_id, item_id);
+
+
+--
+-- Name: sa_responses pk_pass_statement; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.sa_responses
+    ADD CONSTRAINT pk_pass_statement PRIMARY KEY (pass_id, statement_id);
+
+
+--
+-- Name: vsp_test_responses pk_pass_word; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.vsp_test_responses
+    ADD CONSTRAINT pk_pass_word PRIMARY KEY (pass_id, word_id);
+
+
+--
+-- Name: questionnaire questionnaire_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.questionnaire
+    ADD CONSTRAINT questionnaire_pkey PRIMARY KEY (session_id);
+
+
+--
+-- Name: sa_scores sa_scores_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.sa_scores
+    ADD CONSTRAINT sa_scores_pkey PRIMARY KEY (pass_id);
+
+
+--
+-- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.sessions
+    ADD CONSTRAINT sessions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: test_durations test_durations_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.test_durations
+    ADD CONSTRAINT test_durations_pkey PRIMARY KEY (pass_id);
+
+
+--
+-- Name: test_results test_results_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.test_results
+    ADD CONSTRAINT test_results_pkey PRIMARY KEY (pass_id);
+
+
+--
+-- Name: tokens tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.tokens
+    ADD CONSTRAINT tokens_pkey PRIMARY KEY (pass_id);
+
+
+--
+-- Name: vsp_test_scores vsp_test_scores_pkey; Type: CONSTRAINT; Schema: public; Owner: dialangadmin
+--
+
+ALTER TABLE ONLY public.vsp_test_scores
+    ADD CONSTRAINT vsp_test_scores_pkey PRIMARY KEY (pass_id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
